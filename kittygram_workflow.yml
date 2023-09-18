@@ -27,9 +27,9 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip 
+        python -m pip install --upgrade pip
         pip install flake8==6.0.0 flake8-isort==6.0.0
-        pip install -r ./backend/requirements.txt 
+        pip install -r ./backend/requirements.txt
     - name: Test with flake8 and django tests
       env:
         POSTGRES_USER: kittygram_user
@@ -50,17 +50,17 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Login to Docker 
+      - name: Login to Docker
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }} 
+          username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Push to DockerHub
         uses: docker/build-push-action@v4
         with:
           context: ./backend/
           push: true
-          tags: izida/kittygram_backend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_backend:latest
   frontend_tests:
     runs-on: ubuntu-latest
 
@@ -89,7 +89,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Login to Docker 
+      - name: Login to Docker
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -99,7 +99,7 @@ jobs:
         with:
           context: ./frontend/
           push: true
-          tags: izida/kittygram_frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_frontend:latest
   build_gateway_and_push_to_docker_hub:
     name: Push gateway Docker image to DockerHub
     runs-on: ubuntu-latest
@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Login to Docker 
+      - name: Login to Docker
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -118,7 +118,7 @@ jobs:
         with:
           context: ./nginx/
           push: true
-          tags: izida/kittygram_nginx:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/kittygram_nginx:latest
   deploy:
     runs-on: ubuntu-latest
     needs:
@@ -164,4 +164,4 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: Deploy Kittygram is done
+        message: Deploy Kittygram is done. If prod falling down dumbass - ${{ github.actor }}. Why? Hmmm couse -  ${{ github.event.commits[0].message }} https://github.com/${{ github.repository }}/commit/${{github.sha}}
